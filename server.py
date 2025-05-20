@@ -41,6 +41,8 @@ def zip_and_send_uploads():
         files = {'file': (os.path.basename(zip_path), f, 'application/zip')}
         try:
             requests.post(receiver_url, files=files, timeout=30)
+            print("Uploads directory sent....")
+
         except Exception as e:
             print(f"Error sending uploads.zip to receiver backend: {e}")
 
