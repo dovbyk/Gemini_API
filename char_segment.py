@@ -3,7 +3,10 @@ import os
 import numpy as np
 import google.generativeai as genai
 
-genai.configure(api_key="AIzaSyCsFPJPRlBKFF3p7ARWo89zNPXUtsYyz40")
+
+GEMINI = os.getenv("GENAI_API_KEY")
+
+genai.configure(api_key=GEMINI)
 
 def recognize_characters_from_images(image_paths):
 
