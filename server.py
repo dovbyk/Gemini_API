@@ -36,7 +36,7 @@ def zip_and_send_uploads():
                     arcname = os.path.relpath(file_path, UPLOAD_FOLDER)
                     zipf.write(file_path, arcname)
     # Send ZIP to receiver backend
-    receiver_url = "https://betadeep2.onrender.com/receive-uploads"  # <-- CHANGE THIS
+    receiver_url = "https://betadeep.onrender.com/receive-uploads"  # <-- CHANGE THIS
     with open(zip_path, 'rb') as f:
         files = {'file': (os.path.basename(zip_path), f, 'application/zip')}
         try:
