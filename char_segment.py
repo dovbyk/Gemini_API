@@ -87,6 +87,9 @@ def process_uploaded_image(input_image_path):
                 recognized_chars = recognize_characters_from_images(temp_image_paths)
                 for img_path, char in zip(temp_image_paths, recognized_chars):
                     output_path = os.path.join(output_directory, f"{char}.png")
+                    if os.path.exists(output_path):
+                            print(f"Warning: File already exists and will be overwritten: {output_path}")
+        
                     os.rename(img_path, output_path)
                     print(f"Saved: {output_path}")
                     extracted_images.append(output_path)
