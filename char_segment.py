@@ -79,6 +79,7 @@ def process_uploaded_image(input_image_path):
             char_image = binary_image[y:y + h, x:x + w]
             temp_path = os.path.join(output_directory, f"temp_{i}.png")
             cv2.imwrite(temp_path, 255 - char_image)
+            print(f"Before : {temp_path}")
             temp_image_paths.append(temp_path)
 
             # When batch is ready or last image, process batch
