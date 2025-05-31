@@ -97,6 +97,7 @@ def process_uploaded_image(input_image_path):
                     print(f"Saved: {output_path}")
                     extracted_images.append(output_path)
                 temp_image_paths = []  # Reset for next batch
-
+            
+    print(f"Length of extracted images: {len(extracted_images)}")
     return extracted_images
 
