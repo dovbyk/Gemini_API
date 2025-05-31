@@ -20,10 +20,10 @@ def recognize_characters_from_images(image_paths):
             "data": image_data
         })
     prompt = (
-        "Given the following 5 images of handwritten characters (a-z, A-Z, 0-9), "
-        "return the characters in order, with no spaces or extra text. "
-        "If fewer than 5 images are provided, return the characters in order. "
-        "Just output the string of characters."
+         "You are given up to 5 images of **individual handwritten characters**, "
+         "in order from left to right, top to bottom. These characters can be from a-z, A-Z, or 0-9. "
+          "Please return the exact sequence of characters in that order, with no explanation or extra text. "
+          "Just a string of characters like 'aZ5k1'."
     )
     # Gemini expects a list: [prompt, image1, image2, ...]
     response = model.generate_content([prompt] + image_contents)
@@ -72,7 +72,7 @@ def process_uploaded_image(input_image_path):
     sorted_boxes = sorted(merged_boxes, key=lambda b: (b[1], b[0]))
     extracted_images = []
     temp_image_paths = []
-    batch_size = 2
+    batch_size = 5
 
     for i, (x, y, w, h) in enumerate(sorted_boxes):
         if w > 10 and h > 10:
