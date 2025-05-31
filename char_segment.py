@@ -73,7 +73,7 @@ def process_uploaded_image(input_image_path):
     extracted_images = []
     temp_image_paths = []
     batch_size = 6
-
+    i = 0
     for i, (x, y, w, h) in enumerate(sorted_boxes):
         if w > 10 and h > 10:
             char_image = binary_image[y:y + h, x:x + w]
@@ -84,6 +84,8 @@ def process_uploaded_image(input_image_path):
 
             # When batch is ready or last image, process batch
             if len(temp_image_paths) == batch_size or i == len(sorted_boxes) - 1:
+                if i == len(sorted_boxes) - 1:
+                    print("i has reached the final image")
                 recognized_chars = recognize_characters_from_images(temp_image_paths)
                 for img_path, char in zip(temp_image_paths, recognized_chars):
                     output_path = os.path.join(output_directory, f"{char}.png")    
@@ -97,7 +99,8 @@ def process_uploaded_image(input_image_path):
                     print(f"Saved: {output_path}")
                     extracted_images.append(output_path)
                 temp_image_paths = []  # Reset for next batch
-    print(f"Final value of i: {i}")        
+
+    print(f"Final value of i: {i}")    
     print(f"Length of extracted images: {len(extracted_images)}")
     return extracted_images
 
