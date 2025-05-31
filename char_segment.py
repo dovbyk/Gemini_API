@@ -72,7 +72,7 @@ def process_uploaded_image(input_image_path):
     sorted_boxes = sorted(merged_boxes, key=lambda b: (b[1], b[0]))
     extracted_images = []
     temp_image_paths = []
-    batch_size = 5
+    batch_size = 2
 
     for i, (x, y, w, h) in enumerate(sorted_boxes):
         if w > 10 and h > 10:
