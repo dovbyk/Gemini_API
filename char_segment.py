@@ -2,7 +2,6 @@ import cv2
 import os
 import numpy as np
 import google.generativeai as genai
-import shutil
 
 GEMINI = os.getenv("GENAI_API_KEY")
 
@@ -100,7 +99,7 @@ def process_uploaded_image(input_image_path):
                     extracted_images.append(output_path)
                 temp_image_paths = []  # Reset for next batch
 
-    shutil.rmtree(output_directory)
+    
     print(f"Final value of i: {i}")    
     print(f"Length of extracted images: {len(extracted_images)}")
     return extracted_images
