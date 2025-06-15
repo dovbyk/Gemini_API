@@ -29,14 +29,14 @@ def get_image():
     if not image_path or not os.path.exists(image_path):
         return jsonify({'error': 'Image not found'}), 404
 
-    @after_this_request
-    def remove_file(response):
-        try:
-            os.remove(image_path)
-            print(f"Deleted: {image_path}")
-        except Exception as e:
-            print(f"Error deleting file {image_path}: {e}")
-        return response
+    #@after_this_request
+    #def remove_file(response):
+     #   try:
+      #      os.remove(image_path)
+       #     print(f"Deleted: {image_path}")
+        #except Exception as e:
+         #   print(f"Error deleting file {image_path}: {e}")
+        #return response
     
     return send_file(image_path, mimetype='image/png')
 
