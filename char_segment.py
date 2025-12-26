@@ -1,37 +1,84 @@
 import cv2
 import os
 import numpy as np
-import google.generativeai as genai
+import base64
+import itertools
+import requests
 
-GEMINI = os.getenv("GENAI_API_KEY")
+OPENROUTER_KEYS = [
+    os.getenv("OPENROUTER_KEY_1"),
+    os.getenv("OPENROUTER_KEY_2"),
+    os.getenv("OPENROUTER_KEY_3"),
+]
 
-genai.configure(api_key=GEMINI)
+key_cycle = itertools.cycle(OPENROUTER_KEYS)
+
+def get_next_key():
+    return next(key_cycle)
 
 def recognize_characters_from_images(image_paths):
+    api_key = get_next_key()
 
-    model = genai.GenerativeModel("gemini-2.0-flash")
-    image_contents = []
+    images_payload = []
     for path in image_paths:
         with open(path, "rb") as f:
-            image_data = f.read()
-        image_contents.append({
-            "mime_type": "image/png",
-            "data": image_data
+            encoded = base64.b64encode(f.read()).decode("utf-8")
+        images_payload.append({
+            "type": "image_url",
+            "image_url": {
+                "url": f"data:image/png;base64,{encoded}"
+            }
         })
+
     prompt = (
-         "You are given up to 6 images of **individual handwritten characters**, "
-         "in order from left to right, top to bottom. These characters can be from a-z, A-Z, or 0-9. "
-          "Please return the exact sequence of characters in that order, with no explanation or extra text. "
-          "Just a string of characters like 'abcdef' and make your length of response is equal to the received number of images."
+        "You are given up to 6 images of individual handwritten characters, "
+        "in order from left to right, top to bottom. "
+        "Characters may be a-z, A-Z, or 0-9. "
+        "Return ONLY the exact sequence of characters. "
+        "Do NOT include spaces, explanations, or extra text. "
+        "The length of the response MUST equal the number of images."
     )
-    # Gemini expects a list: [prompt, image1, image2, ...]
-    response = model.generate_content([prompt] + image_contents)
-    characters = response.text.strip()
-    # Defensive: Only take as many characters as images
+
+    payload = {
+        "model": "google/gemini-2.0-flash",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    *images_payload
+                ]
+            }
+        ],
+        "temperature": 0
+    }
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "http://localhost",
+        "X-Title": "handwritten-character-ocr"
+    }
+
+    response = requests.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers=headers,
+        json=payload,
+        timeout=60
+    )
+
+    response.raise_for_status()
+    result = response.json()
+
+    characters = result["choices"][0]["message"]["content"].strip()
+
+    # Defensive check
     if len(characters) != len(image_paths):
-        print(f"Warning: Gemini returned unexpected result: '{characters}' for batch {image_paths}")
+        print(f"Warning: Gemini returned '{characters}' for {len(image_paths)} images")
         characters = characters[:len(image_paths)]
+
     return characters
+
 
 def process_uploaded_image(input_image_path):
     output_directory = "processed_characters"
