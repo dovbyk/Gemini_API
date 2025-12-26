@@ -17,35 +17,43 @@ def get_next_key():
     return next(key_cycle)
 
 def recognize_characters_from_images(image_paths):
-    api_key = get_next_key()
 
-    images_payload = []
+    api_key = get_next_key()  
+
+    # Build Gemini content parts
+    parts = [
+        {
+            "type": "text",
+            "text": (
+                "You are given up to 6 images of individual handwritten characters, "
+                "in order from left to right, top to bottom. "
+                "Characters may be a-z, A-Z, or 0-9. "
+                "Return ONLY the exact sequence of characters. "
+                "Do NOT add spaces or explanations. "
+                "The response length MUST equal the number of images."
+            )
+        }
+    ]
+
+    # Add images (Gemini-compatible format)
     for path in image_paths:
         with open(path, "rb") as f:
             encoded = base64.b64encode(f.read()).decode("utf-8")
-        images_payload.append({
-            "type": "input_image",
-            "image_url": f"data:image/png;base64,{encoded}"
-        })
 
-    prompt = (
-        "You are given up to 6 images of individual handwritten characters, "
-        "in order from left to right, top to bottom. "
-        "Characters may be a-z, A-Z, or 0-9. "
-        "Return ONLY the exact sequence of characters. "
-        "Do NOT include spaces, explanations, or extra text. "
-        "The length of the response MUST equal the number of images."
-    )
+        parts.append({
+            "type": "input_image",
+            "inline_data": {
+                "mime_type": "image/png",
+                "data": encoded
+            }
+        })
 
     payload = {
         "model": "google/gemini-2.0-flash",
         "messages": [
             {
                 "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    *images_payload
-                ]
+                "content": parts
             }
         ],
         "temperature": 0
@@ -65,14 +73,18 @@ def recognize_characters_from_images(image_paths):
         timeout=60
     )
 
-    response.raise_for_status()
-    result = response.json()
+    # Print OpenRouter error if any (VERY useful)
+    if response.status_code != 200:
+        print("OpenRouter error response:", response.text)
 
+    response.raise_for_status()
+
+    result = response.json()
     characters = result["choices"][0]["message"]["content"].strip()
 
-    # Defensive check
+    # Defensive length check
     if len(characters) != len(image_paths):
-        print(f"Warning: Gemini returned '{characters}' for {len(image_paths)} images")
+        print(f"Warning: unexpected output '{characters}'")
         characters = characters[:len(image_paths)]
 
     return characters
