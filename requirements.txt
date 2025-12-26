@@ -1,6 +1,6 @@
 Flask>=2.2
 Flask-Cors>=3.0
-opencv-python>=4.7
-numpy>=1.21
 gunicorn>=20.1.0
-openai
+opencv-python-headless>=4.7
+numpy>=1.21
+requests>=2.28
