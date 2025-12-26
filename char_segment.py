@@ -41,15 +41,14 @@ def recognize_characters_from_images(image_paths):
             encoded = base64.b64encode(f.read()).decode("utf-8")
 
         parts.append({
-            "type": "input_image",
-            "inline_data": {
-                "mime_type": "image/png",
-                "data": encoded
+            "type": "image_url",
+            "image_url": {
+                "url": f"data:image/png;base64,{encoded}"
             }
         })
 
     payload = {
-        "model": "google/gemini-2.0-flash",
+        "model": "openai/gpt-4o-mini",
         "messages": [
             {
                 "role": "user",
