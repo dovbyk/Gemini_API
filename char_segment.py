@@ -24,10 +24,8 @@ def recognize_characters_from_images(image_paths):
         with open(path, "rb") as f:
             encoded = base64.b64encode(f.read()).decode("utf-8")
         images_payload.append({
-            "type": "image_url",
-            "image_url": {
-                "url": f"data:image/png;base64,{encoded}"
-            }
+            "type": "input_image",
+            "image_url": f"data:image/png;base64,{encoded}"
         })
 
     prompt = (
