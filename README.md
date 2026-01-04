@@ -1,1 +1,1 @@
-## It's a intermediate backend for the DeepScript project.
+## It's an intermediate backend for the DeepScript project.
